@@ -1,0 +1,12 @@
+extends layout
+
+block script
+  script
+    var socket = io.connect('http://#{host}:7008') ;
+    socket.on('message', function(data) {
+      var TestData = jQuery.parseJSON(data) ;
+      $('body').append('<p>' + data[0][1] + '</p>') ;
+    }) ;
+
+block main
+  p Hello World
