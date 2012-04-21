@@ -1,5 +1,7 @@
-var app = require('express').createServer(),
-    io = require('socket.io').listen(7008) ;
+var express = require('express'),
+    app = express.createServer(),
+    io = require('socket.io').listen(7008),
+    net = require('net') ;
 
 // We need a shuffle method for arrays
 Array.prototype.shuffle = function() {
@@ -24,13 +26,15 @@ function ReloadTestData(data) {
   Frc.shuffle() ;
   for (var i=0; i<data.length; i++) {
     data[i][0] = Frc[i] ;
-    data[i][1] = Math.floor(Math.random()*256) ;
+    data[i][1] = Math.floor(Math.random()*10) ;
   }
   return data ;
 }
 
+// little webserver for client html5 + javascript
 app.set('view engine', 'jade') ;
-app.set('view options', {layout: true}) ;
+
+app.use(express.static(__dirname + '/public')) ;
 
 app.get('/', function(req, res) {
   res.render('index', {host: req.headers.host.split(':')[0]}) ;
@@ -39,7 +43,25 @@ app.get('/', function(req, res) {
 
 app.listen(7007) ;
 
+/* websocket server sending fft data
 setInterval(function() {
   TestData = ReloadTestData(TestData) ;
   io.sockets.json.send(TestData) ;
-}, 500) ;
+}, 5000) ;
+*/
+
+// tcp server listening for fft data
+var ffm_listener = net.createServer(function(socket) {
+  console.log("new connection") ;
+  socket.setEncoding('utf8') ;
+  socket.on('data', function(data) {
+    data = data.split('\;')[0].split('\\').join('') ; // TODO: check input!!!!
+    try {
+      data = JSON.parse(data) ; //TODO: fetch exception in a proper way
+      // TODO: check input size
+      io.sockets.json.send(data) ;
+    } catch(e) {
+    }
+  }) ;
+}) ;
+ffm_listener.listen(7000) ;

@@ -2,8 +2,12 @@
 html
   head
     script(src='http://code.jquery.com/jquery-latest.min.js')
+    script(src='http://#{host}:7007/javascript/Three.js')
+    script(src='http://#{host}:7007/javascript/Three_r42.js')
+    script(src='http://#{host}:7007/javascript/toxiclibs.min.js')
+    script(src='http://#{host}:7007/javascript/ToxiclibsSupport.js')
     script(src='http://#{host}:7008/socket.io/socket.io.js')
-    block script
+    link(rel='stylesheet', href='/stylesheets/screen.css')
   body
-   block main
+   section#wrapper!= body
 
